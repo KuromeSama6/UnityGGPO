@@ -27,6 +27,27 @@ extern "C" {
         FreeBufferDelegate freeBuffer,
         OnEventDelegate onEvent,
         const char* game, int num_players, int localport);
+
+    PLUGINEX(int) UggTestStartSession(GGPOPtr& sessionRef,
+        BeginGameDelegate beginGame,
+        AdvanceFrameDelegate advanceFrame,
+        LoadGameStateDelegate loadGameState,
+        LogGameStateDelegate logGameState,
+        SaveGameStateDelegate saveGameState,
+        FreeBufferDelegate freeBuffer,
+        OnEventDelegate onEvent,
+        const char* game, int num_players, int localport);
+
+    PLUGINEX(int) UggTestStartSessionCustomInputSize(GGPOPtr& sessionRef,
+        BeginGameDelegate beginGame,
+        AdvanceFrameDelegate advanceFrame,
+        LoadGameStateDelegate loadGameState,
+        LogGameStateDelegate logGameState,
+        SaveGameStateDelegate saveGameState,
+        FreeBufferDelegate freeBuffer,
+        OnEventDelegate onEvent,
+        const char* game, int num_players, int input_size, int localport);
+
     PLUGINEX(void) UggSetLogDelegate(LogDelegate callback);
     PLUGINEX(int) UggStartSession(GGPOPtr& sessionRef,
         BeginGameDelegate beginGame,
@@ -37,6 +58,15 @@ extern "C" {
         FreeBufferDelegate freeBuffer,
         OnEventDelegate onEvent,
         const char* game, int num_players, int localport);
+    PLUGINEX(int) UggStartSessionCustomInputSize(GGPOPtr& sessionRef,
+        BeginGameDelegate beginGame,
+        AdvanceFrameDelegate advanceFrame,
+        LoadGameStateDelegate loadGameState,
+        LogGameStateDelegate logGameState,
+        SaveGameStateDelegate saveGameState,
+        FreeBufferDelegate freeBuffer,
+        OnEventDelegate onEvent,
+        const char* game, int num_players, int input_size, int localport);
     PLUGINEX(int) UggStartSpectating(GGPOPtr& sessionRef,
         BeginGameDelegate beginGame,
         AdvanceFrameDelegate advanceFrame,
@@ -46,10 +76,21 @@ extern "C" {
         FreeBufferDelegate freeBuffer,
         OnEventDelegate onEvent,
         const char* game, int num_players, int localport, char* host_ip, int host_port);
+    PLUGINEX(int) UggStartSpectatingCustomInputSize(GGPOPtr& sessionRef,
+        BeginGameDelegate beginGame,
+        AdvanceFrameDelegate advanceFrame,
+        LoadGameStateDelegate loadGameState,
+        LogGameStateDelegate logGameState,
+        SaveGameStateDelegate saveGameState,
+        FreeBufferDelegate freeBuffer,
+        OnEventDelegate onEvent,
+        const char* game, int num_players, int input_size, int localport, char* host_ip, int host_port);
     PLUGINEX(int) UggSetDisconnectNotifyStart(GGPOPtr ggpo, int timeout);
     PLUGINEX(int) UggSetDisconnectTimeout(GGPOPtr ggpo, int timeout);
     PLUGINEX(int) UggSynchronizeInput(GGPOPtr ggpo, uint64_t* inputs, int length, int& disconnect_flags);
+    PLUGINEX(int) UggSynchronizeInputCustomSize(GGPOPtr ggpo, void* inputs, int length, int size, int& disconnect_flags);
     PLUGINEX(int) UggAddLocalInput(GGPOPtr ggpo, int local_player_handle, uint64_t input);
+    PLUGINEX(int) UggAddLocalInputCustomSize(GGPOPtr ggpo, int local_player_handle, void* input, int size);
     PLUGINEX(int) UggCloseSession(GGPOPtr ggpo);
     PLUGINEX(int) UggIdle(GGPOPtr ggpo, int timeout);
     PLUGINEX(int) UggAddPlayer(GGPOPtr ggpo,

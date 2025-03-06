@@ -6,7 +6,7 @@ namespace UnityGGPO {
     public enum GGPOPlayerType {
         GGPO_PLAYERTYPE_LOCAL,
         GGPO_PLAYERTYPE_REMOTE,
-        GGPO_PLAYERTYPE_SPECTATOR,
+        GGPO_PLAYERTYPE_SPECTATOR, 
     }
 
     [Serializable]
@@ -31,7 +31,7 @@ namespace UnityGGPO {
     }
 
     public static partial class GGPO {
-        private const string libraryName = "UnityGGPO";
+        private const string libraryName = "UnityGGPO"; 
 
         public const int MAX_PLAYERS = 4;
         public const int MAX_PREDICTION_FRAMES = 8;
@@ -166,6 +166,18 @@ namespace UnityGGPO {
             IntPtr freeBuffer,
             IntPtr onEvent,
             string game, int num_players, int localport);
+        
+        
+        [DllImport(libraryName)]
+        public static extern int UggTestStartSessionCustomInputSize(out IntPtr session,
+                                                                    IntPtr beginGame,
+                                                                    IntPtr advanceFrame,
+                                                                    IntPtr loadGameState,
+                                                                    IntPtr logGameState,
+                                                                    IntPtr saveGameState,
+                                                                    IntPtr freeBuffer,
+                                                                    IntPtr onEvent,
+                                                                    string game, int num_players, int input_size, int localport);
 
         [DllImport(libraryName)]
         private static extern int UggStartSession(out IntPtr session,
@@ -177,7 +189,18 @@ namespace UnityGGPO {
             IntPtr freeBuffer,
             IntPtr onEvent,
             string game, int num_players, int localport);
-
+        
+        [DllImport(libraryName)]
+        private static extern int UggStartSessionCustomInputSize(out IntPtr session,
+                                                                 IntPtr beginGame,
+                                                                 IntPtr advanceFrame,
+                                                                 IntPtr loadGameState,
+                                                                 IntPtr logGameState,
+                                                                 IntPtr saveGameState,
+                                                                 IntPtr freeBuffer,
+                                                                 IntPtr onEvent,
+                                                                 string game, int num_players, int input_size, int localport);
+        
         [DllImport(libraryName)]
         private static extern int UggStartSpectating(out IntPtr session,
             IntPtr beginGame,
@@ -188,6 +211,17 @@ namespace UnityGGPO {
             IntPtr freeBuffer,
             IntPtr onEvent,
             string game, int num_players, int localport, string host_ip, int host_port);
+        
+        [DllImport(libraryName)]
+        private static extern int UggStartSpectatingCustomInputSize(out IntPtr session,
+                                                     IntPtr beginGame,
+                                                     IntPtr advanceFrame,
+                                                     IntPtr loadGameState,
+                                                     IntPtr logGameState,
+                                                     IntPtr saveGameState,
+                                                     IntPtr freeBuffer,
+                                                     IntPtr onEvent,
+                                                     string game, int num_players, int localport, string host_ip, int input_size, int host_port);
 
         [DllImport(libraryName)]
         private static extern int UggSetDisconnectNotifyStart(IntPtr ggpo, int timeout);
@@ -199,7 +233,13 @@ namespace UnityGGPO {
         private static extern int UggSynchronizeInput(IntPtr ggpo, IntPtr inputs, int length, out int disconnect_flags);
 
         [DllImport(libraryName)]
+        private static extern int UggSynchronizeInputCustomSize(IntPtr ggpo, IntPtr inputs, int length, int size, out int disconnect_flags);
+
+        [DllImport(libraryName)]
         private static extern int UggAddLocalInput(IntPtr ggpo, int local_player_handle, long input);
+
+        [DllImport(libraryName)]
+        private static extern int UggAddLocalInputCustomSize(IntPtr ggpo, int local_player_handle, IntPtr input, int size);
 
         [DllImport(libraryName)]
         private static extern int UggCloseSession(IntPtr ggpo);
@@ -251,6 +291,18 @@ namespace UnityGGPO {
                 string game, int num_players, int localport) {
             return UggStartSession(out session, beginGame, advanceFrame, loadGameState, logGameState, saveGameState, freeBuffer, onEvent, game, num_players, localport);
         }
+        
+        public static int StartSession(out IntPtr session,
+                                       IntPtr beginGame,
+                                       IntPtr advanceFrame,
+                                       IntPtr loadGameState,
+                                       IntPtr logGameState,
+                                       IntPtr saveGameState,
+                                       IntPtr freeBuffer,
+                                       IntPtr onEvent,
+                                       string game, int num_players, int inputSize, int localport) {
+            return UggStartSessionCustomInputSize(out session, beginGame, advanceFrame, loadGameState, logGameState, saveGameState, freeBuffer, onEvent, game, num_players, inputSize, localport);
+        }
 
         public static int StartSpectating(out IntPtr session,
                 IntPtr beginGame,
@@ -263,6 +315,18 @@ namespace UnityGGPO {
                 string game, int num_players, int localport, string host_ip, int host_port) {
             return UggStartSpectating(out session, beginGame, advanceFrame, loadGameState, logGameState, saveGameState, freeBuffer, onEvent, game, num_players, localport, host_ip, host_port);
         }
+        
+        public static int StartSpectating(out IntPtr session,
+                                          IntPtr beginGame,
+                                          IntPtr advanceFrame,
+                                          IntPtr loadGameState,
+                                          IntPtr logGameState,
+                                          IntPtr saveGameState,
+                                          IntPtr freeBuffer,
+                                          IntPtr onEvent,
+                                          string game, int num_players, int localport, string host_ip, int input_size, int host_port) {
+            return UggStartSpectatingCustomInputSize(out session, beginGame, advanceFrame, loadGameState, logGameState, saveGameState, freeBuffer, onEvent, game, num_players, localport, host_ip, input_size, host_port);
+        }
 
         public static int SetDisconnectNotifyStart(IntPtr ggpo, int timeout) {
             return UggSetDisconnectNotifyStart(ggpo, timeout);
@@ -271,21 +335,41 @@ namespace UnityGGPO {
         public static int SetDisconnectTimeout(IntPtr ggpo, int timeout) {
             return UggSetDisconnectTimeout(ggpo, timeout);
         }
-
-        public static long[] SynchronizeInput(IntPtr ggpo, int length, out int disconnect_flags) {
+        
+        public static long[] SynchronizeInput(IntPtr ggpo, int length, out int result, out int disconnect_flags) {
             IntPtr pnt = Marshal.AllocHGlobal(Marshal.SizeOf(typeof(long)) * length);
-            var result = UggSynchronizeInput(ggpo, pnt, length, out disconnect_flags);
+            result = UggSynchronizeInput(ggpo, pnt, length, out disconnect_flags);
             var inputs = new long[length];
             Marshal.Copy(pnt, inputs, 0, length);
             Marshal.FreeHGlobal(pnt);
-            if (!SUCCEEDED(result)) {
-                throw new Exception(GetErrorCodeMessage(result));
-            }
             return inputs;
+        }
+        
+        public static byte[][] SynchronizeInput(IntPtr ggpo, int length, int size, out int result, out int disconnect_flags) {
+            IntPtr pnt = Marshal.AllocHGlobal(size * length);
+            result = UggSynchronizeInputCustomSize(ggpo, pnt, length, size, out disconnect_flags);
+            
+            var ret = new byte[length][];
+            if (!SUCCEEDED(result)) {
+                Marshal.FreeHGlobal(pnt);
+                return ret;
+            }
+            
+            for (int i = 0; i < length; i++) {
+                ret[i] = new byte[size];
+                Marshal.Copy(pnt + i * size, ret[i], 0, size);
+            }
+            
+            Marshal.FreeHGlobal(pnt);
+            return ret;
         }
 
         public static int AddLocalInput(IntPtr ggpo, int local_player_handle, long input) {
             return UggAddLocalInput(ggpo, local_player_handle, input);
+        }
+        
+        public static int AddLocalInput(IntPtr ggpo, int local_player_handle, IntPtr input, int size) {
+            return UggAddLocalInputCustomSize(ggpo, local_player_handle, input, size);
         }
 
         public static int CloseSession(IntPtr ggpo) {
@@ -337,5 +421,18 @@ namespace UnityGGPO {
                 string game, int num_players, int localport) {
             return UggTestStartSession(out session, beginGame, advanceFrame, loadGameState, logGameState, saveGameState, freeBuffer, onEvent, game, num_players, localport);
         }
+        
+        public static int TestStartSession(out IntPtr session,
+                                           IntPtr beginGame,
+                                           IntPtr advanceFrame,
+                                           IntPtr loadGameState,
+                                           IntPtr logGameState,
+                                           IntPtr saveGameState,
+                                           IntPtr freeBuffer,
+                                           IntPtr onEvent,
+                                           string game, int num_players, int inputSize, int localport) {
+            return UggTestStartSessionCustomInputSize(out session, beginGame, advanceFrame, loadGameState, logGameState, saveGameState, freeBuffer, onEvent, game, num_players, inputSize, localport);
+        }
+        
     }
 }

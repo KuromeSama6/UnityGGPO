@@ -128,7 +128,7 @@ PLUGINEX(int) UggTestStartSession(GGPOPtr& sessionRef,
     const char* game, int num_players, int localport)
 {
     UggCallLogv(LOG_TESTS, "UggTestStartSession - %s %i %i", game, num_players, localport);
-    GGPOSessionCallbacks cb;
+    GGPOSessionCallbacks cb; 
     cb.advance_frame = advanceFrame;
     cb.load_game_state = loadGameState;
     cb.begin_game = beginGame;
@@ -141,6 +141,34 @@ PLUGINEX(int) UggTestStartSession(GGPOPtr& sessionRef,
     TestAllDelegates(cb);
     GGPOSession* ggpo;
     auto ret = ggpo_start_session(&ggpo, &cb, game, num_players, sizeof(uint64_t), localport);
+    sessionRef = (GGPOPtr)ggpo;
+    return ret;
+}
+
+PLUGINEX(int) UggTestStartSessionCustomInputSize(GGPOPtr& sessionRef,
+    BeginGameDelegate beginGame,
+    AdvanceFrameDelegate advanceFrame,
+    LoadGameStateDelegate loadGameState,
+    LogGameStateDelegate logGameState,
+    SaveGameStateDelegate saveGameState,
+    FreeBufferDelegate freeBuffer,
+    OnEventDelegate onEvent,
+    const char* game, int num_players, int input_size, int localport)
+{
+    UggCallLogv(LOG_TESTS, "UggTestStartSession - %s %i %i", game, num_players, localport);
+    GGPOSessionCallbacks cb;
+    cb.advance_frame = advanceFrame;
+    cb.load_game_state = loadGameState;
+    cb.begin_game = beginGame;
+    cb.save_game_state = saveGameState;
+    cb.load_game_state = loadGameState;
+    cb.log_game_state = logGameState;
+    cb.free_buffer = freeBuffer;
+    cb.on_event = onEvent;
+
+    TestAllDelegates(cb);
+    GGPOSession* ggpo;
+    auto ret = ggpo_start_session(&ggpo, &cb, game, num_players, input_size, localport);
     sessionRef = (GGPOPtr)ggpo;
     return ret;
 }
@@ -172,6 +200,33 @@ PLUGINEX(int) UggStartSession(GGPOPtr& sessionRef,
     return ret;
 }
 
+PLUGINEX(int) UggStartSessionCustomInputSize(GGPOPtr& sessionRef,
+    BeginGameDelegate beginGame,
+    AdvanceFrameDelegate advanceFrame,
+    LoadGameStateDelegate loadGameState,
+    LogGameStateDelegate logGameState,
+    SaveGameStateDelegate saveGameState,
+    FreeBufferDelegate freeBuffer,
+    OnEventDelegate onEvent,
+    const char* game, int num_players, int input_size, int localport)
+{
+    UggCallLogv(LOG_INFO, "UggStartSession - %s %i %i", game, num_players, localport);
+    GGPOSessionCallbacks cb;
+    cb.advance_frame = advanceFrame;
+    cb.load_game_state = loadGameState;
+    cb.begin_game = beginGame;
+    cb.save_game_state = saveGameState;
+    cb.load_game_state = loadGameState;
+    cb.log_game_state = logGameState;
+    cb.free_buffer = freeBuffer;
+    cb.on_event = onEvent;
+
+    GGPOSession* ggpo;
+    auto ret = ggpo_start_session(&ggpo, &cb, game, num_players, input_size, localport);
+    sessionRef = (GGPOPtr)ggpo;
+    return ret;
+}
+
 PLUGINEX(int) UggStartSpectating(GGPOPtr& sessionRef,
     BeginGameDelegate beginGame,
     AdvanceFrameDelegate advanceFrame,
@@ -198,6 +253,32 @@ PLUGINEX(int) UggStartSpectating(GGPOPtr& sessionRef,
     return ret;
 }
 
+PLUGINEX(int) UggStartSpectatingCustomInputSize(GGPOPtr& sessionRef,
+    BeginGameDelegate beginGame,
+    AdvanceFrameDelegate advanceFrame,
+    LoadGameStateDelegate loadGameState,
+    LogGameStateDelegate logGameState,
+    SaveGameStateDelegate saveGameState,
+    FreeBufferDelegate freeBuffer,
+    OnEventDelegate onEvent,
+    const char* game, int num_players, int input_size, int localport, char* host_ip, int host_port)
+{
+    UggCallLogv(LOG_INFO, "UggStartSpectating - %s %i %i %s %i", game, num_players, localport, host_ip, host_port);
+    GGPOSessionCallbacks cb;
+    cb.advance_frame = advanceFrame;
+    cb.load_game_state = loadGameState;
+    cb.begin_game = beginGame;
+    cb.save_game_state = saveGameState;
+    cb.load_game_state = loadGameState;
+    cb.log_game_state = logGameState;
+    cb.free_buffer = freeBuffer;
+    cb.on_event = onEvent;
+
+    GGPOSession* ggpo;
+    auto ret = ggpo_start_spectating(&ggpo, &cb, game, num_players, input_size, localport, host_ip, host_port);
+    return ret;
+}
+
 PLUGINEX(int) UggSetDisconnectNotifyStart(GGPOPtr ggpo, int timeout)
 {
     UggCallLog(LOG_INFO, "UggSetDisconnectNotifyStart");
@@ -216,10 +297,22 @@ PLUGINEX(int) UggSynchronizeInput(GGPOPtr ggpo, uint64_t* inputs, int length, in
     return ggpo_synchronize_input((GGPOSession*)ggpo, inputs, sizeof(uint64_t) * length, &disconnect_flags);
 }
 
+PLUGINEX(int) UggSynchronizeInputCustomSize(GGPOPtr ggpo, void* inputs, int length, int size, int& disconnect_flags)
+{
+    UggCallLog(LOG_VERBOSE, "UggSynchronizeInput");
+    return ggpo_synchronize_input((GGPOSession*)ggpo, inputs, size * length, &disconnect_flags);
+}
+
 PLUGINEX(int) UggAddLocalInput(GGPOPtr ggpo, int local_player_handle, uint64_t input)
 {
     UggCallLog(LOG_VERBOSE, "UggAddLocalInput");
     return ggpo_add_local_input((GGPOSession*)ggpo, local_player_handle, &input, sizeof(uint64_t));
+}
+
+PLUGINEX(int) UggAddLocalInputCustomSize(GGPOPtr ggpo, int local_player_handle, void* input, int size)
+{
+    UggCallLog(LOG_VERBOSE, "UggAddLocalInput");
+    return ggpo_add_local_input((GGPOSession*)ggpo, local_player_handle, input, size);
 }
 
 PLUGINEX(int) UggCloseSession(GGPOPtr ggpo)

@@ -1,6 +1,7 @@
 {
     "name": "unityggpo.plugin",
     "version": "1.0.1",
-    "displayName": "UnityGGPO Plugin",
-    "description": "UnityGGPO Plugin a wrapper around the GGPO DLL with some changes to make use in Unity easier. https://github.com/nykwil/UnityGGPO.git?path=/Unity/Packages/UnityGGPO"
+    "displayName": "UnityGGPO Plugin (Forked)",
+    "description": "UnityGGPO Plugin a wrapper around the GGPO DLL with some changes to make use in Unity easier. This is a forked version of the original UnityGGPO plugin, containing additional features and improvements. https://github.com/KuromeSama6/UnityGGPO.",
+    "author": "nykwil"
 }
